@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 import glob
 import random
 import math
@@ -12,13 +13,13 @@ from OpenGL.GLU import *
 from moviepy.editor import ImageSequenceClip
 
 # Constants and configuration
-GRID_SIZE = 10  # Change this to 1, 2, 3, 4, etc. for different grid sizes
-VIEW_DISTANCE = 20  # The higher the number, the farther out the camera view will be from the cubes
-CUBE_SPACING = 20  # The higher the number, the more space between cubes
-SIDE_DISPLAY_TIME = 0  # How long to stay on each side (in seconds)
+GRID_SIZE = 9  # Change this to 1, 2, 3, 4, etc. for different grid sizes
+VIEW_DISTANCE = 22  # The higher the number, the farther out the camera view will be from the cubes
+CUBE_SPACING = 8  # The higher the number, the more space between cubes
+SIDE_DISPLAY_TIME = 0.5  # How long to stay on each side (in seconds)
 ROTATION_SPEED = 0.5  # Adjust this value to control the speed of rotation (degrees per second)
-FPS = 25  # Frames per second for the output video
-VIDEO_RESOLUTION = (750, 750)
+FPS = 30  # Frames per second for the output video
+VIDEO_RESOLUTION = (1000, 1000)
 
 # Ensure directory exists
 def ensure_directory_exists(directory):
@@ -83,14 +84,14 @@ def check_texture_size(texture_id):
     width = glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH)
     height = glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT)
     return width, height
-
+ 
 # Cube creation and drawing
 def create_cube_with_images(cube_index, front_side_image_path, adjacent_sides_image_path, texture_ids_list, preloaded_textures):
     texture_ids_list[cube_index][0] = preloaded_textures[front_side_image_path][0]
     actual_size = check_texture_size(texture_ids_list[cube_index][0])
-    print(f"Cube {cube_index + 1} front face:")
-    print(f"  Reported resolution: {preloaded_textures[front_side_image_path][1][0]}x{preloaded_textures[front_side_image_path][1][1]}")
-    print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
+    #print(f"Cube {cube_index + 1} front face:")
+    #print(f"  Reported resolution: {preloaded_textures[front_side_image_path][1][0]}x{preloaded_textures[front_side_image_path][1][1]}")
+    #print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
     
     for i in range(1, 6):
         if i == 3:  # If it's the bottom face, rotate the image 180 degrees
@@ -98,16 +99,16 @@ def create_cube_with_images(cube_index, front_side_image_path, adjacent_sides_im
             texture_id, dimensions = load_rotated_texture(rotated_image)
             texture_ids_list[cube_index][i] = texture_id
             actual_size = check_texture_size(texture_id)
-            print(f"Cube {cube_index + 1} bottom face:")
-            print(f"  Reported resolution: {dimensions[0]}x{dimensions[1]}")
-            print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
+            #print(f"Cube {cube_index + 1} bottom face:")
+            #print(f"  Reported resolution: {dimensions[0]}x{dimensions[1]}")
+            #print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
         else:
             texture_ids_list[cube_index][i] = preloaded_textures[adjacent_sides_image_path][0]
     
     actual_size = check_texture_size(preloaded_textures[adjacent_sides_image_path][0])
-    print(f"Cube {cube_index + 1} other faces:")
-    print(f"  Reported resolution: {preloaded_textures[adjacent_sides_image_path][1][0]}x{preloaded_textures[adjacent_sides_image_path][1][1]}")
-    print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
+    #print(f"Cube {cube_index + 1} other faces:")
+    #print(f"  Reported resolution: {preloaded_textures[adjacent_sides_image_path][1][0]}x{preloaded_textures[adjacent_sides_image_path][1][1]}")
+    #print(f"  Actual GL texture size: {actual_size[0]}x{actual_size[1]}")
 
 def draw_cube(cube_index, texture_ids_list):
     glEnable(GL_TEXTURE_2D)
@@ -324,11 +325,15 @@ def main():
         frame_image = render_frame(valid_cubes, cube_positions, texture_ids_list, cube_rotations)
         frames.append(frame_image)
     
+    # Generate the current date and time string
+    current_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
     # Create and save the video
-    output_path = os.path.join(base_input_folder, "rotating_cubes.mp4")
+    output_path = os.path.join(base_input_folder, f"{current_datetime}_rotating_cubes.mp4")
+    
     print("Creating video...")
     clip = ImageSequenceClip(frames, fps=FPS)
-    clip.write_videofile(output_path, codec="libx264", progress_bar=True)
+    clip.write_videofile(output_path, codec="libx264", logger='bar')
     
     print(f"Video saved to: {output_path}")
     
