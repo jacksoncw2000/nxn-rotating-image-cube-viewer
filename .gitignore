@@ -1,3 +1,6 @@
+# Ignore everything in the source_images folder
+source_images/*
+
 last_folder.txt
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudio,macos,windows
