@@ -3,6 +3,7 @@ import time
 import glob
 import random
 import math
+from tqdm import tqdm
 import numpy as np
 import pygame
 from pygame.locals import *
@@ -11,14 +12,13 @@ from OpenGL.GLU import *
 from moviepy.editor import ImageSequenceClip
 
 # Constants and configuration
-GRID_SIZE = 1  # Change this to 1, 2, 3, 4, etc. for different grid sizes
-VIEW_DISTANCE = 6  # The higher the number, the farther out the camera view will be from the cubes
-CUBE_SPACING = 2  # The higher the number, the more space between cubes
-SIDE_DISPLAY_TIME = 1  # How long to stay on each side (in seconds)
-ROTATION_SPEED = 2.0  # Adjust this value to control the speed of rotation (degrees per second)
-FPS = 70  # Frames per second for the output video
-
-VIDEO_RESOLUTION = (3000, 3000)
+GRID_SIZE = 10  # Change this to 1, 2, 3, 4, etc. for different grid sizes
+VIEW_DISTANCE = 20  # The higher the number, the farther out the camera view will be from the cubes
+CUBE_SPACING = 20  # The higher the number, the more space between cubes
+SIDE_DISPLAY_TIME = 0  # How long to stay on each side (in seconds)
+ROTATION_SPEED = 0.5  # Adjust this value to control the speed of rotation (degrees per second)
+FPS = 25  # Frames per second for the output video
+VIDEO_RESOLUTION = (750, 750)
 
 # Ensure directory exists
 def ensure_directory_exists(directory):
@@ -38,7 +38,7 @@ def init_pygame_opengl():
 # Texture loading and management
 def load_texture(img_path):
     max_size = glGetIntegerv(GL_MAX_TEXTURE_SIZE)
-    print(f"Maximum texture size supported: {max_size}x{max_size}")
+    #print(f"Maximum texture size supported: {max_size}x{max_size}")
     
     texture_surface = pygame.image.load(img_path).convert_alpha()
     texture_data = pygame.image.tobytes(texture_surface, "RGBA", 1)
@@ -72,7 +72,7 @@ def preload_textures(img_files):
     for img_path in img_files:
         texture_id, dimensions = load_texture(img_path)
         preloaded_textures[img_path] = (texture_id, dimensions)
-    print(f"Preloaded {len(preloaded_textures)} textures")
+    #print(f"Preloaded {len(preloaded_textures)} textures")
     return preloaded_textures
 
 def delete_texture(texture_id):
@@ -252,7 +252,8 @@ def main():
     
     # Preload textures for all cubes
     preloaded_textures = {}
-    for cube_files in img_files_list:
+    print("Preloading textures...")
+    for cube_files in tqdm(img_files_list, desc="Preloading textures", unit="cube"):
         preloaded_textures.update(preload_textures(cube_files))
     
     texture_ids_list = [[None] * 6 for _ in valid_cubes]
@@ -271,7 +272,8 @@ def main():
     total_frames = int(max_images * (SIDE_DISPLAY_TIME + ROTATION_SPEED) * FPS)
 
     # Initialize cubes with first images
-    for idx, cube_index in enumerate(valid_cubes):
+    print("Initializing cubes...")
+    for idx, cube_index in enumerate(tqdm(valid_cubes, desc="Initializing cubes", unit="cube")):
         front_image = img_files_list[cube_index][0]
         adjacent_image = img_files_list[cube_index][1] if len(img_files_list[cube_index]) > 1 else front_image
         create_cube_with_images(idx, front_image, adjacent_image, texture_ids_list, preloaded_textures)
@@ -279,7 +281,8 @@ def main():
     current_time = 0
     next_rotation_time = SIDE_DISPLAY_TIME
 
-    for frame in range(total_frames):
+    print("Rendering frames...")
+    for frame in tqdm(range(total_frames), desc="Rendering frames", unit="frame"):
         current_time += 1 / FPS
 
         if current_time >= next_rotation_time:
@@ -320,13 +323,12 @@ def main():
         # Render and capture the frame
         frame_image = render_frame(valid_cubes, cube_positions, texture_ids_list, cube_rotations)
         frames.append(frame_image)
-        
-        print(f"Rendered frame {frame + 1}/{total_frames}")
     
     # Create and save the video
     output_path = os.path.join(base_input_folder, "rotating_cubes.mp4")
+    print("Creating video...")
     clip = ImageSequenceClip(frames, fps=FPS)
-    clip.write_videofile(output_path, codec="libx264")
+    clip.write_videofile(output_path, codec="libx264", progress_bar=True)
     
     print(f"Video saved to: {output_path}")
     
