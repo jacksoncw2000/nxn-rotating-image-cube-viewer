@@ -85,4 +85,44 @@ A viewer for displaying a scalable number of rotating image cubes.
     * CUBE_SPACING = 2
     * SIDE_DISPLAY_TIME = 0
     * ROTATION_SPEED = 1.0
-    
+* 7x7 Cubes with no space
+    * GRID_SIZE = 7
+    * VIEW_DISTANCE = 24
+    * CUBE_SPACING = 6
+    * SIDE_DISPLAY_TIME = 2
+    * ROTATION_SPEED = 2
+    * FPS = 30
+    * VIDEO_RESOLUTION = (3000, 3000)
+* 8x8 Cubes with no space
+    * GRID_SIZE = 8
+    * VIEW_DISTANCE = 26
+    * CUBE_SPACING = 7
+    * SIDE_DISPLAY_TIME = 1
+    * ROTATION_SPEED = 0.5
+    * FPS = 30
+    * VIDEO_RESOLUTION = (2200, 2200)
+* 9x9 Cubes with no space
+    * GRID_SIZE = 9
+    * VIEW_DISTANCE = 30
+    * CUBE_SPACING = 8
+    * SIDE_DISPLAY_TIME = 0.5
+    * ROTATION_SPEED = 0.5
+    * FPS = 40
+    * VIDEO_RESOLUTION = (2000, 2000)
+* 10x10 Cubes with no space
+    * GRID_SIZE = 10
+    * VIEW_DISTANCE = 30
+    * CUBE_SPACING = 9
+    * SIDE_DISPLAY_TIME = 1
+    * ROTATION_SPEED = 2
+    * FPS = 40
+    * VIDEO_RESOLUTION = (1500, 1500)
+* 10x10 Cubes with no space
+    * GRID_SIZE = 10
+    * VIEW_DISTANCE = 25
+    * CUBE_SPACING = 9
+    * SIDE_DISPLAY_TIME = 1
+    * ROTATION_SPEED = 1
+    * FPS = 60
+    * VIDEO_RESOLUTION = (2000, 2000)
+    * CAMERA_POSITION_MODIFIER = 1.31
